@@ -25,34 +25,35 @@ export default function SettingsScreen() {
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.label}>{t('languageLabel')}</Text>
-	
-		<Picker
-		  selectedValue={tempLanguage}
-		  onValueChange={(value) => {
-			setTempLanguage(value);
-			i18n.changeLanguage(value); // Immediately update the language
-		  }}
-		  style={styles.picker}
-		>
-		  <Picker.Item label="English" value="en" style= {{fontSize: 16 }}/>
-		  <Picker.Item label="עברית" value="he" style= {{fontSize: 16 }}/>
-		  <Picker.Item label="Русский" value="ru" style= {{fontSize: 16 }}/>
-		</Picker>
-
-		
-
-
+      {/* Wrap the Picker in a bordered container */}
+      <View style={styles.pickerContainer}>
+        <Picker
+          selectedValue={tempLanguage}
+          onValueChange={(value) => {
+            setTempLanguage(value);
+            i18n.changeLanguage(value); // Immediately update the language
+          }}
+          style={styles.picker}
+        >
+          <Picker.Item label="English" value="en" style={{ fontSize: 16 }} />
+          <Picker.Item label="עברית" value="he" style={{ fontSize: 16 }} />
+          <Picker.Item label="Русский" value="ru" style={{ fontSize: 16 }} />
+        </Picker>
+      </View>
 
       <Text style={styles.label}>{t('countryLabel')}</Text>
-     <Picker
-		  selectedValue={tempCountry}
-		  onValueChange={(value) => setTempCountry(value)}
-		  style={[styles.picker, { color: '#000' }]}  // set text color to black
-		>
-		  {countryCodes.map(code => (
-			<Picker.Item key={code} label={t(`country_${code}`)} value={code} style= {{fontSize: 16 }}/>
-		  ))}
-	</Picker>
+      {/* Wrap the second Picker in a bordered container too */}
+      <View style={styles.pickerContainer}>
+        <Picker
+          selectedValue={tempCountry}
+          onValueChange={(value) => setTempCountry(value)}
+          style={[styles.picker, { color: '#000' }]} // keep color: #000 for text
+        >
+          {countryCodes.map(code => (
+            <Picker.Item key={code} label={t(`country_${code}`)} value={code} style={{ fontSize: 16 }} />
+          ))}
+        </Picker>
+      </View>
 
       <View style={styles.buttonContainer}>
         <Button title={t('save')} onPress={handleSave} />
@@ -71,8 +72,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: spacing.small,
   },
-  picker: {
+  // New style for the picker border
+  pickerContainer: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 4,
     marginBottom: spacing.medium,
+  },
+  picker: {
+    // You can remove or keep marginBottom here if desired
+    // marginBottom: spacing.medium,
   },
   buttonContainer: {
     marginTop: spacing.medium,

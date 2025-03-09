@@ -1,5 +1,6 @@
 // AnyGoodExpo/context/SettingsContext.tsx
 import React, { createContext, useContext, useState } from 'react';
+import * as Localization from 'expo-localization';
 
 interface SettingsContextProps {
   language: string;
@@ -11,9 +12,9 @@ interface SettingsContextProps {
 const SettingsContext = createContext<SettingsContextProps | undefined>(undefined);
 
 export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Use language and country codes (e.g., 'en' for English, 'il' for Israel)
-  const [language, setLanguage] = useState('en');
-  const [country, setCountry] = useState('il');
+  // Use device default language (e.g., 'ru') and a default country (update as needed).
+  const [language, setLanguage] = useState(Localization.locale.split('-')[0] || 'en');
+  const [country, setCountry] = useState('il'); // Update default country if needed
 
   return (
     <SettingsContext.Provider value={{ language, setLanguage, country, setCountry }}>

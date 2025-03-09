@@ -1,4 +1,4 @@
-// AnyGoodExpo/App.tsx
+// AnyGood/App.tsx
 import './locales/i18n'; // This initializes i18next.
 import React from 'react';
 import RootNavigator from './navigation/RootNavigator';
