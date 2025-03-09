@@ -1,0 +1,112 @@
+apply plugin: "com.android.application"
+apply plugin: "com.facebook.react"
+apply plugin: "kotlin-android" // ✅ Ensure Kotlin Plugin is applied
+
+import com.android.build.OutputFile
+
+def projectRoot = rootDir.getAbsoluteFile().getParentFile().getAbsolutePath()
+def expoDebuggableVariants = ['debug']
+
+// Override `debuggableVariants` for expo-updates debugging
+if (System.getenv('EX_UPDATES_NATIVE_DEBUG') == "1") {
+    react {
+        expoDebuggableVariants = []
+    }
+}
+
+react {
+    entryFile = file(["node", "-e", "require('expo/scripts/resolveAppEntry')", projectRoot, "android", "absolute"]
+        .execute(null, rootDir).text.trim())
+    reactNativeDir = new File(["node", "--print", "require.resolve('react-native/package.json')"]
+        .execute(null, rootDir).text.trim()).getParentFile().getAbsoluteFile()
+    hermesCommand = new File(["node", "--print", "require.resolve('react-native/package.json')"]
+        .execute(null, rootDir).text.trim()).getParentFile().getAbsolutePath() + "/sdks/hermesc/%OS-BIN%/hermesc"
+    debuggableVariants = expoDebuggableVariants
+}
+
+// ✅ Force Kotlin Version
+ext {
+    hermesEnabled = (findProperty('expo.jsEngine') ?: "hermes") == "hermes"
+    kotlinVersion = '1.6.21'  // ✅ Downgraded to match Gradle 8.0 and React Native Gradle Plugin
+}
+
+android {
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    ndkVersion rootProject.ext.ndkVersion
+
+    namespace 'com.example.anygoodexpo'
+
+    defaultConfig {
+        applicationId 'com.example.anygoodexpo'
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode 1
+        versionName "1.0.0"
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17  // ✅ Ensure Java 17 Compatibility
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+
+    splits {
+        abi {
+            reset()
+            enable false  // Avoid separate APKs for different CPU architectures
+            universalApk true  // ✅ Generate a universal APK
+        }
+    }
+
+    buildTypes {
+        debug {
+            signingConfig signingConfigs.debug
+        }
+        release {
+            signingConfig signingConfigs.debug
+            shrinkResources (findProperty('android.enableShrinkResourcesInReleaseBuilds')?.toBoolean() ?: false)
+            minifyEnabled (findProperty('android.enableProguardInReleaseBuilds')?.toBoolean() ?: false)
+            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+        }
+    }
+}
+
+dependencies {
+    implementation("com.facebook.react:react-android")
+
+    def frescoVersion = rootProject.ext.frescoVersion
+
+    implementation("com.facebook.fresco:fresco:${frescoVersion}")
+    implementation("com.facebook.fresco:imagepipeline-okhttp3:${frescoVersion}")
+
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.0.0")
+
+    // ✅ Ensure Flipper uses compatible dependencies
+    def flipperVersion = "0.183.0"
+    debugImplementation("com.facebook.flipper:flipper:${flipperVersion}")
+    debugImplementation("com.facebook.flipper:flipper-network-plugin:${flipperVersion}") {
+        exclude group: 'com.squareup.okhttp3', module: 'okhttp'
+    }
+    debugImplementation("com.facebook.flipper:flipper-fresco-plugin:${flipperVersion}")
+
+    // ✅ Ensure Hermes is enabled correctly
+    if (hermesEnabled.toBoolean()) {
+        implementation("com.facebook.react:hermes-android")
+    }
+}
+
+// ✅ Force correct Kotlin version explicitly
+configurations.all {
+    resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+        if (details.requested.group == 'org.jetbrains.kotlin') {
+            details.useVersion '1.6.21'
+        }
+    }
+}
+
+apply from: new File(["node", "--print", "require.resolve('@react-native-community/cli-platform-android/package.json')"]
+    .execute(null, rootDir).text.trim(), "../native_modules.gradle");
+applyNativeModulesAppBuildGradle(project)

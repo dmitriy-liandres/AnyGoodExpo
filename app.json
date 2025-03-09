@@ -1,28 +1,33 @@
 {
   "expo": {
     "name": "AnyGoodExpo",
-    "slug": "AnyGoodExpo",
+    "slug": "anygoodexpo",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
-    "newArchEnabled": true,
+    "icon": "./assets/drawable/icon.png",
+    "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/drawable/icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      }
+        "foregroundImage": "./assets/drawable/icon.png",
+        "backgroundColor": "#FFFFFF"
+      },
+      "package": "com.example.anygoodexpo",
+      "jsEngine": "jsc"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/drawable/ic_settings.png"
     }
   }
 }
+

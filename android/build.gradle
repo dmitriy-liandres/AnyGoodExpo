@@ -1,0 +1,30 @@
+buildscript {
+    ext {
+        kotlinVersion = '1.6.21' // ✅ Force Kotlin 1.6.21
+        buildToolsVersion = '34.0.0'
+        minSdkVersion = 21
+        compileSdkVersion = 34
+        targetSdkVersion = 34
+        frescoVersion = '2.5.0'
+        ndkVersion = "23.1.7779620"
+    }
+
+    repositories {
+        google()
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath("com.android.tools.build:gradle:8.0.0") // ✅ Keep Gradle at 8.0, NOT 8.2
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion") // ✅ Ensure Kotlin 1.6.21
+        classpath("com.facebook.react:react-native-gradle-plugin")
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        maven { url 'https://www.jitpack.io' }
+    }
+}
