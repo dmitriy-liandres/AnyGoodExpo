@@ -52,8 +52,8 @@ export default function StartScreen() {
       // Prepare generateFirstQuestion payload.
       const initialRequest: InitialQuestionDTO = {
         initialQuery: product,
-        selectedCountry: country,
-        selectedLanguage: language,
+        selectedCountryCode: country,
+        selectedLanguageCode: language,
       };
       const questionData: QuestionWithAnswerDTO = await generateFirstQuestion(initialRequest);
       // Navigate to the Question screen.
