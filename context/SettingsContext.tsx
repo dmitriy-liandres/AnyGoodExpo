@@ -1,32 +1,62 @@
-// AnyGoodExpo/context/SettingsContext.tsx
-import React, { createContext, useContext, useState } from 'react';
-import * as Localization from 'expo-localization';
+import React, { createContext, useEffect, useState } from 'react';
+import * as SecureStore from 'expo-secure-store';
 
-interface SettingsContextProps {
+type SettingsContextType = {
   language: string;
   setLanguage: (lang: string) => void;
   country: string;
   setCountry: (country: string) => void;
-}
+};
 
-const SettingsContext = createContext<SettingsContextProps | undefined>(undefined);
+export const SettingsContext = createContext<SettingsContextType>({
+  language: 'en',
+  setLanguage: () => {},
+  country: 'US',
+  setCountry: () => {},
+});
 
-export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Use device default language (e.g., 'ru') and a default country (update as needed).
-  const [language, setLanguage] = useState(Localization.locale.split('-')[0] || 'en');
-  const [country, setCountry] = useState('il'); // Update default country if needed
+export const SettingsProvider = ({ children }: { children: React.ReactNode }) => {
+  const [language, setLanguageState] = useState('en');
+  const [country, setCountryState] = useState('US');
+
+  useEffect(() => {
+    const loadSettings = async () => {
+      const storedLanguage = await SecureStore.getItemAsync('languageCode');
+      if (storedLanguage) {
+        setLanguageState(storedLanguage);
+      }
+
+      const storedCountry = await SecureStore.getItemAsync('countryCode');
+      if (storedCountry) {
+        setCountryState(storedCountry);
+      }
+    };
+
+    loadSettings();
+  }, []);
+
+  const setLanguage = async (lang: string) => {
+    setLanguageState(lang);
+    await SecureStore.setItemAsync('languageCode', lang);
+  };
+
+  const setCountry = async (newCountry: string) => {
+    setCountryState(newCountry);
+    await SecureStore.setItemAsync('countryCode', newCountry);
+  };
 
   return (
-    <SettingsContext.Provider value={{ language, setLanguage, country, setCountry }}>
+    <SettingsContext.Provider
+      value={{
+        language,
+        setLanguage,
+        country,
+        setCountry,
+      }}
+    >
       {children}
     </SettingsContext.Provider>
   );
 };
 
-export function useSettings() {
-  const context = useContext(SettingsContext);
-  if (!context) {
-    throw new Error('useSettings must be used within a SettingsProvider');
-  }
-  return context;
-}
+export const useSettings = () => React.useContext(SettingsContext);

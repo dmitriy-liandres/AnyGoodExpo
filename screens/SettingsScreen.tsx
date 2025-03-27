@@ -33,6 +33,7 @@ export default function SettingsScreen() {
             i18n.changeLanguage(value);
           }}
           style={styles.picker}
+		  itemStyle={styles.pickerItem}
           dropdownIconColor={Platform.OS === 'ios' ? '#000' : undefined}
         >
           <Picker.Item label="English" value="en" style={styles.pickerItem} />
@@ -47,6 +48,7 @@ export default function SettingsScreen() {
           selectedValue={tempCountry}
           onValueChange={(value) => setTempCountry(value)}
           style={styles.picker}
+		  itemStyle={styles.pickerItem}
           dropdownIconColor={Platform.OS === 'ios' ? '#000' : undefined}
         >
           {countryCodes.map((code) => (
@@ -83,14 +85,15 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     borderRadius: 4,
     marginBottom: spacing.medium,
-    backgroundColor: Platform.OS === 'ios' ? '#fff' : undefined,
+    
   },
   picker: {
-    color: Platform.OS === 'ios' ? '#000' : undefined,
   },
   pickerItem: {
     fontSize: 16,
-    color: '#000',
+  },
+  pickerItem: {
+    color: '#000', // items in dropdown (iOS only)
   },
   buttonContainer: {
     marginTop: spacing.medium,

@@ -8,6 +8,8 @@ import { login, generateFirstQuestion, InitialQuestionDTO, QuestionWithAnswerDTO
 import { useSettings } from '../context/SettingsContext';
 import * as Application from 'expo-application';
 import RoundedButton from '../components/RoundedButton';
+import * as SecureStore from 'expo-secure-store';
+import * as Crypto from 'expo-crypto';
 
 export default function StartScreen() {
   const navigation = useNavigation();
@@ -16,6 +18,12 @@ export default function StartScreen() {
   const [product, setProduct] = useState('');
   const [validationError, setValidationError] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const generateDeviceId = async () => {
+	  return await Crypto.digestStringAsync(
+		Crypto.CryptoDigestAlgorithm.SHA256,
+		`${Date.now()}-${Math.random()}`
+	  );
+	};
 
   async function handleStart() {
     // Validate that a product has been entered.
@@ -30,17 +38,11 @@ export default function StartScreen() {
 
     try {
       // Retrieve the real device ID.
-      let deviceId = "default_telephone";
-      if (Platform.OS === 'android') {
-        deviceId = Application.androidId || "default_telephone";
-      } else if (Platform.OS === 'ios') {
-        try {
-          deviceId = await Application.getIosIdForVendorAsync();
-        } catch (e) {
-          deviceId = "default_telephone";
-        }
-      }
-
+      let deviceId = await SecureStore.getItemAsync('device-id');
+	  if (!deviceId) {
+		deviceId = await generateDeviceId();
+		await SecureStore.setItemAsync('device-id', deviceId);
+	  }
       const telephoneInfo = {
         telephoneId: deviceId,
         country,    // country code, e.g., "il"
@@ -64,6 +66,7 @@ export default function StartScreen() {
       setIsSubmitting(false);
     }
   }
+
 
   const remainingProduct = 100 - product.length;
 
@@ -94,8 +97,7 @@ const styles = StyleSheet.create({
   container: { 
     flex: 1, 
     backgroundColor: colors.background, 
-    padding: spacing.large, 
-    justifyContent: 'center' 
+    padding: spacing.large
   },
   title: { 
     fontSize: 18, 
