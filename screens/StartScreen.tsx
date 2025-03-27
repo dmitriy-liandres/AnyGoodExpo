@@ -1,5 +1,5 @@
 // AnyGoodExpo/screens/StartScreen.tsx
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, StyleSheet, Alert, Platform, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { colors, spacing } from '../styles/theme';
@@ -10,20 +10,74 @@ import * as Application from 'expo-application';
 import RoundedButton from '../components/RoundedButton';
 import * as SecureStore from 'expo-secure-store';
 import * as Crypto from 'expo-crypto';
+import * as Localization from 'expo-localization';
+import 'react-native-get-random-values';
+import { v4 as uuidv4 } from 'uuid';
+
 
 export default function StartScreen() {
   const navigation = useNavigation();
   const { t } = useTranslation();
   const { country, language } = useSettings();
+  const { setLanguage } = useSettings();
   const [product, setProduct] = useState('');
   const [validationError, setValidationError] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoadingLanguage, setIsLoadingLanguage] = useState(true);
   const generateDeviceId = async () => {
 	  return await Crypto.digestStringAsync(
 		Crypto.CryptoDigestAlgorithm.SHA256,
 		`${Date.now()}-${Math.random()}`
 	  );
 	};
+	
+  useEffect(() => {
+
+    const loadLanguage = async () => {
+      const storedLanguage = await SecureStore.getItemAsync('languageCode');
+      if (storedLanguage) {
+        setLanguage(storedLanguage);
+      } else {
+        const systemLang = Localization.locale.split('-')[0];
+        if (['en', 'he', 'ru'].includes(systemLang)) {
+          setLanguage(systemLang);
+        } else {
+          setLanguage('en');
+        }
+      }
+      setIsLoadingLanguage(false);
+    };
+	
+	const loadCountry = async () => {
+	  const storedCountry = await SecureStore.getItemAsync('countryCode');
+	  if (storedCountry) {
+		setCountry(storedCountry);
+	  } else {
+		const systemCountry = Localization.region;
+		if (systemCountry) {
+		  setCountry(systemCountry);
+		} else {
+		  setCountry('us');
+		}
+	  }
+	};
+
+    loadLanguage();
+	loadCountry();
+  }, []);
+  
+  if (isLoadingLanguage) {
+    return null;
+  }
+  
+  const loadDeviceId = async (): Promise<string> => {
+	  let deviceId = await SecureStore.getItemAsync('device-id');
+	  if (!deviceId) {
+		deviceId = uuidv4();
+		await SecureStore.setItemAsync('device-id', deviceId);
+	  }
+	  return deviceId;
+  };
 
   async function handleStart() {
     // Validate that a product has been entered.
@@ -36,18 +90,17 @@ export default function StartScreen() {
     if (isSubmitting) return;
     setIsSubmitting(true);
 
+
     try {
       // Retrieve the real device ID.
-      let deviceId = await SecureStore.getItemAsync('device-id');
-	  if (!deviceId) {
-		deviceId = await generateDeviceId();
-		await SecureStore.setItemAsync('device-id', deviceId);
-	  }
+	  const deviceId = await loadDeviceId();
+	  
       const telephoneInfo = {
         telephoneId: deviceId,
-        country,    // country code, e.g., "il"
-        language,   // language code, e.g., "en"
+        country,    
+        language,  
       };
+	  telephoneInfo.telephoneId = await SecureStore.getItemAsync('device-id');
 
       await login(telephoneInfo);
 
@@ -69,7 +122,6 @@ export default function StartScreen() {
 
 
   const remainingProduct = 100 - product.length;
-
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{t('startTitle')}</Text>

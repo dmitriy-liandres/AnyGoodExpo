@@ -48,8 +48,8 @@ export interface ProductDTO {
 }
 
 
-const API_BASE_URL = "http://10.0.2.2:8080"; 
-//const API_BASE_URL = "https://anygood.online"; 
+//const API_BASE_URL = "http://10.0.2.2:8080"; 
+const API_BASE_URL = "https://anygood.online"; 
 
 // JWT token storage
 let jwtToken: string | null = null;

@@ -18,7 +18,6 @@ export default function SettingsScreen() {
   function handleSave() {
     setLanguage(tempLanguage);
     setCountry(tempCountry);
-    i18n.changeLanguage(tempLanguage);
     navigation.goBack();
   }
 

@@ -1,5 +1,6 @@
 import React, { createContext, useEffect, useState } from 'react';
 import * as SecureStore from 'expo-secure-store';
+import { useTranslation } from 'react-i18next';
 
 type SettingsContextType = {
   language: string;
@@ -11,13 +12,14 @@ type SettingsContextType = {
 export const SettingsContext = createContext<SettingsContextType>({
   language: 'en',
   setLanguage: () => {},
-  country: 'US',
+  country: 'us',
   setCountry: () => {},
 });
 
 export const SettingsProvider = ({ children }: { children: React.ReactNode }) => {
   const [language, setLanguageState] = useState('en');
-  const [country, setCountryState] = useState('US');
+  const [country, setCountryState] = useState('us');
+  const {i18n } = useTranslation();
 
   useEffect(() => {
     const loadSettings = async () => {
@@ -37,12 +39,13 @@ export const SettingsProvider = ({ children }: { children: React.ReactNode }) =>
 
   const setLanguage = async (lang: string) => {
     setLanguageState(lang);
+	i18n.changeLanguage(lang);
     await SecureStore.setItemAsync('languageCode', lang);
   };
 
   const setCountry = async (newCountry: string) => {
-    setCountryState(newCountry);
-    await SecureStore.setItemAsync('countryCode', newCountry);
+    setCountryState(newCountry.toLowerCase());
+    await SecureStore.setItemAsync('countryCode', newCountry.toLowerCase());
   };
 
   return (
