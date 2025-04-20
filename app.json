@@ -2,7 +2,7 @@
   "expo": {
     "name": "AnyGood",
     "slug": "anygood",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/drawable/icon.png",
     "userInterfaceStyle": "automatic",
@@ -18,6 +18,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "io.anygood",
+	  "appStoreUrl": "https://apps.apple.com/app/anygood/id6743716669",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -28,7 +29,8 @@
         "backgroundColor": "#FFFFFF"
       },
       "package": "io.anygood",
-      "jsEngine": "jsc"
+      "jsEngine": "jsc",
+	  "playStoreUrl": "https://play.google.com/store/apps/details?id=io.anygood"
     },
     "web": {
       "favicon": "./assets/drawable/ic_settings.png"
