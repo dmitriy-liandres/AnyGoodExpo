@@ -132,7 +132,11 @@ export default function StartScreen() {
         onChangeText={(text) => { setProduct(text); if(validationError) setValidationError(""); }}
         maxLength={100}
       />
-      <Text style={styles.remainingText}>{remainingProduct}/100</Text>
+	  <View style={styles.helperContainer}>
+        <Text style={styles.examplesText}>t('startExample')</Text>
+        <Text style={styles.remainingText}>{remainingProduct}/100</Text>
+      </View>
+	  
       {validationError ? (
         <Text style={styles.errorText}>{validationError}</Text>
       ) : null}
@@ -161,6 +165,18 @@ const styles = StyleSheet.create({
     borderRadius: 4, 
     padding: spacing.small, 
     marginBottom: spacing.small 
+  },
+  helperContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  examplesText: {
+    fontSize: 12,
+    color: '#888',
+    flex: 1,
+    marginRight: 8,
   },
   remainingText: { 
     fontSize: 12, 

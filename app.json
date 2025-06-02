@@ -2,7 +2,7 @@
   "expo": {
     "name": "AnyGood",
     "slug": "anygood",
-    "version": "1.0.1",
+    "version": "1.0.3",
     "orientation": "portrait",
     "icon": "./assets/drawable/icon.png",
     "userInterfaceStyle": "automatic",
